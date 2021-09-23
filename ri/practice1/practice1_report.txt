@@ -79,3 +79,12 @@ wind                0    0    0    1    0    0    0    0    0    0
 with                0    0    0    1    0    0    0    0    0    0
 wizard              0    0    0    0    0    1    0    0    0    0
 
+## Ex2
+
+ex2.py, runnable with python ex2.py (filename)
+tp1-p2.ipynb for interactive
+
+## Ex3
+
+ex3.py, runnable with python ex3.py (filename)
+tp1-p3.ipynb for interactive
