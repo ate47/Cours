@@ -86,5 +86,15 @@ tp1-p2.ipynb for interactive
 
 ## Ex3
 
-ex3.py, runnable with python ex3.py (filename)
-tp1-p3.ipynb for interactive
+ex3.py, runnable with python ex3.py (filename) (query)
+
+query:
+
+all operand must be splitted with space
+
+Operator:
+AND: space
+OR : |
+NOT: !
+
+python .\ex3.py .\doc.txt "Casablanca | Wind ! ( the Citezen )"
