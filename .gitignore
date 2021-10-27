@@ -198,3 +198,7 @@ forge*changelog.txt
 logs
 
 .DS_STORE
+
+*.docx
+*.gz
+
