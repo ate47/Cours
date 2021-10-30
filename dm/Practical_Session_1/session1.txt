@@ -1,0 +1,389 @@
+********************************************************************************
+********* Practical Session 1: Datamining For Big Data *************************
+********************************************************************************
+
+You need to complete this file with your answers and upload it in the "M2
+CS Big data (BIG DATA)" course on Claroline connect.
+
+Do not modify or remove lines starting with stars "****". I use them to extract your name and answers.
+Write your answers only between lines "******* answer X.X" and "******* end answer X.X".
+
+****** Fill in your name on the next line  (do not modify or remove this line)
+Antoine Willerval
+****** end name (do not modify or remove this line)
+
+
+The aim of this session is to practice with the spark framework.
+You will use the interactive pyspark shell.
+
+****************************************************
+****** TODO
+****************************************************
+When you unzip session1.zip, this create a directory Practical_Session_1 in which you will find
+the 'session1.txt' file and a data/ directory containing several example data files.
+
+To start this practical session, you should:
+1- open this file 'session1.txt' with a text editor to be able to write your answers in it.
+2- prepare to start the pyspark shell in the terminal:
+  A- If you use your own computer where you have installed spark:
+     - start a terminal in the directory where you have unzipped session1.zip
+     - go to step 4-.
+
+  B- If you have not installed spark on your computer: use a computer of the university:
+    - In this case you have to connect to the computer mira2.univ-st-etienne.fr using the ssh command.
+      In a terminal, type (replace your_login with your university login):
+      ssh your_login@mira2.univ-st-etienne.fr
+      (it will ask for your password)
+      Then you are connected to mira2.
+    - From there, you have to copy the session1.zip in your home directory of the university if you have not done it yet:
+      cp /home/jeudbapt/big_data/session1.zip .
+    - then unzip it:
+      unzip session1.zip
+    - then cd into the extracted directory : 
+      cd Practical_Session_1
+
+4- Now, you can start the pyspark shell:
+ (This command works for those that use the university computers,
+ if you have your own installation of Spark, the path to pyspark binary will be different).
+
+ export PYSPARK_PYTHON=python3
+ /home/jeudbapt/local/spark-3.0.1-bin-hadoop2.7/bin/pyspark --master local[2]
+
+5- Then to try the pyspark shell, type (in the pyspark shell):
+sc.parallelize(range(50)).collect()
+ It should output the list [1,2,3,....,49]. Otherwise, pyspark is not working.
+
+ In case of error, it may be necessary to type:
+ export SPARK_LOCAL_IP=127.0.0.1
+ in the terminal before launching pyspark.
+
+ remarks: 
+
+   The "--master local[4]" option means that spark is started on the local machine on 4 cores.
+   By default, the pyspark shell may use python version 2.7. The line:
+   export PYSPARK_PYTHON=python3
+   is to use python3.
+
+   To set the log level (for the messages displayed by pyspark), you can type
+   (in the pyspark shell) :
+     sc.setLogLevel("WARN")
+   valid log levels include: ALL, DEBUG, ERROR, FATAL, INFO, OFF, TRACE, WARN
+
+
+6- Except for the questions of part I, you should copy in this file the code that you type in the
+   interactive shell.
+
+7- At the end of the session, upload this file session1.txt on claroline connect (BIG DATA course).
+
+8- If you have not finished at the end of the session, you can continue at home and upload another version
+   later (but in this case, do not remove your first version).
+
+********************************************************************************
+***************  Some documentation:
+********************************************************************************
+
+ You will use Spark version 2.3 or higher.
+
+ These versions provide another data structure (DataFrames) in addition to
+ RDDs, but you will use RDD (RDD are less powerful but simpler).
+
+ The Quick Start guide for Spark version >2.1 is mainly focused on
+ DataFrames and not RDDs.
+ Therefore, you will use the Quick start guide of version 2.0.
+
+ The Spark start page (version 2.0):
+ http://spark.apache.org/docs/2.0.0/quick-start.html
+
+ Python 3 tutorial:
+ https://docs.python.org/3/tutorial/index.html
+ In the tutorial, each example is available in several languages (scala, python,...).
+ You have to select the python version.
+
+ Spark documentation on RDDs:
+   http://spark.apache.org/docs/latest/rdd-programming-guide.html
+  the available Spark operations on RDDs:
+  - transformations:
+    http://spark.apache.org/docs/latest/rdd-programming-guide.html#transformations
+  - actions:
+    http://spark.apache.org/docs/latest/rdd-programming-guide.html#actions
+
+  - If you are interested, the full documentation of the pyspark package (with examples): 
+    http://spark.apache.org/docs/latest/api/python/pyspark.html 
+
+
+********************************************************************************
+*****************  Part I
+********************************************************************************
+
+1) Go on the quick start page of version 2.0:
+http://spark.apache.org/docs/2.0.0/quick-start.html
+Do the "Basic" part on the "lotr.txt" text file (this text file is in data directory of the zip file).
+(For the filter transformation, use the word "Bilbo" instead of "Spark")
+
+2) Do the "more on RDD" operations using again the "lotr.txt" text file.
+
+
+********************************************************************************
+************************* IMPORTANT ******************************************** 
+********************************************************************************
+
+For the next questions, you have to copy in this file the code that you
+type in the interactive shell between the lines "******* answer x.x" and
+"******* end answer x.x".  Do not modify or remove these two lines (they
+are used to automatically extract your answers).
+********************************************************************************
+
+
+********************************************************************************
+******************  Part II
+********************************************************************************
+
+For these questions, you will need the following operations on RDD
+(see the documentations on RDD, the links are above).
+- map
+- flatmap
+- reduceByKey
+- filter
+- take
+- collect
+- sortBy
+
+The file products.txt  contains a list of products.
+Each line of this file is:
+TID product_name price category
+
+1) Generate a RDD named "prod" of tuples (tid, name, price, category) from this text file.
+   The "tid" should be an integer and price a float. You can use the function int() to convert a string to an integer (e.g., int("12") is 12) and float() to convert to a float.
+   This RDD will contain tuples like (1, "apple", 3.3, "fruit") ...
+******* answer 2.1: do not modify or remove this line
+rdd = sc.textFile("data/products.txt")
+prod = rdd.map(lambda s: s.split("\t"))
+prod = prod.map(lambda k: (int(k[0]), k[1], float(k[2]), k[3]))
+******* end answer 2.1: do not modify or remove this line
+
+This "product" RDD will be the input RDD for all the following questions.
+
+2) Generate a RDD "prod20" with all products with price > 20.
+******* answer 2.2
+def filter_prod20(value):
+    _, _, price, _ = value
+    return price > 20
+prod20 = prod.filter(filter_prod20)
+******* end answer 2.2
+
+3) Sort the RDD of previous question by ascending prices. You can use the sortBy() transformation. The parameter of sortBy() is a function used to sort the RDD. For instance, if rdd contains tuples t=(t[0], t[1],...),
+rdd.sortBy(lambda t: t[1]) will sort according to the ascending value of t[1] while
+rdd.sortBy(lambda t: t[1]+t[2], ascending=False) will sort according to the descending value of t[1]+t[2].
+******* answer 2.3
+def sort_prod20(value):
+    _, _, price, _ = value
+    return price
+prod20s = prod20.sortBy(sort_prod20)
+******* end answer 2.3
+
+
+4) Generate a RDD "maxpricebycat" with the maximum price for each category of product.
+The result RDD will contain pairs like ("film", 42.9); ("beverage",15.0)...
+******* answer 2.4
+def func_map(v):
+    _, _, price, category = v
+    return category, price
+
+maxpricebycat = prod.map(func_map)
+
+def func_reduce(a, b):
+    return a if a > b else b
+
+maxpricebycat = maxpricebycat.reduceByKey(func_reduce)r
+******* end answer 2.4
+
+
+5) Generate a RDD "countbycat" with the number of products in each category
+******* answer 2.5
+def func_map(v):
+    _, _, _, category = v
+    return (category, 1)
+
+
+countbycat = prod.map(func_map)
+
+from operator import add
+
+countbycat = countbycat.reduceByKey(add)
+******* end answer 2.5
+
+We want a RDD with the average price of products in each category (eg, ("fruit", 7.63) ...)
+You will do it first in a wrong way using a reduce function avg() which is not associative :
+def avg(a,b):
+   return 0.5*(a+b)
+6) Generate (an incorrect) RDD using this "avg" function for the reduce. Check that the result are actually incorrect.
+******* answer 2.6
+def func_map(v):
+    _, _, price, category = v
+    return category, price
+
+badavg = prod.map(func_map)
+
+def avg(a, b):
+    return 0.5*(a+b)
+
+badavg = badavg.reduceByKey(avg)
+******* end answer 2.6
+
+7) Before doing the reduce with "avg" in the previous function, sort the RDD by increasing prices using sortby()
+   Check that the results are still incorrect and different from those of question 5.
+   Do the same by sorting by decreasing prices, and check the results are again different from the two previous ones.
+******* answer 2.7
+def func_map(v):
+    _, _, price, category = v
+    return category, price
+
+
+badavg = prod.map(func_map)
+
+def sort_func(value):
+    _, price = value
+    return price
+
+
+badavg = badavg.sortBy(sort_func)
+
+def avg(a, b):
+    return 0.5*(a+b)
+
+
+badavg = badavg.reduceByKey(avg)
+
+******* end answer 2.7
+
+
+So, as we have seen in course, using a non-associative function gives
+incorrect results and the results depends on the order of the elements in
+the RDD.
+
+8) Generate a RDD "avg_price" with the (correct) average price of products in each category.
+As in the course, you can for instance
+ - fist compute a rdd of (category, (sum_of_price, nb_of_product))
+ - or use a weighted average function
+******* answer 2.8
+def func_map(v):
+    _, _, price, category = v
+    return category, (price, 1)
+
+
+goodavg = prod.map(func_map)
+
+
+def func_reduce(a, b):
+    pricea, counta = a
+    priceb, countb = b
+    return pricea + priceb, counta + countb
+
+
+goodavg = goodavg.reduceByKey(func_reduce)
+
+
+def func_map(v):
+    category, (price, count) = v
+    return category, price / count
+
+
+goodavg = goodavg.map(func_map)
+
+******* end answer 2.8
+
+
+********************************************************************************
+*************** Part III
+********************************************************************************
+In this part, you may also need operations union(), distinct() and intersection().
+
+
+ In this part you will use the files A.txt and B.txt that are
+ sets/multisets of integers (one integer per line).  The aim of this part
+ is to compute operations (union, intersection,...) on sets or multi-sets
+ using Spark.
+
+ The result RDD for each question must be a list of integers.
+
+ In questions 1 and 2, we consider that we are working on sets.
+ This means that each element should appear at most once in the result.
+
+1) Compute the union of A and B (First, you need to build RDDs for sets A
+   and B)
+******* answer 3.1
+unionAB = A.union(B).distinct()
+******* end answer 3.1
+
+2) Compute the intersection of A and B:
+******* answer 3.2
+interAB = A.intersection(B)
+******* end answer 3.2
+
+
+ We can define all these operations on multisets also. A multiset is a set
+ where an element can appears several times.
+
+3) Union (if an element appear a times in A and b times in B, it must
+   appear a+b times in the union)
+******* answer 3.3
+unionAB = A.union(B)
+******* end answer 3.3
+
+
+For the following, it may be interesting to buid an intermediate RDD "sets"
+that contains elements of the form (el, (a,b)) where "el" is an element of
+the multi-set, "a" its number of occurrences in A and "b" its number of
+occurrences in B. For instance, it will contain (1, (2, 5)) meaning that
+"1" appears 2 times in A and 5 times in B.
+
+And then, compute the result RDD of the following questions from "sets"
+RDDs.
+
+
+4) Intersection (if an element appear a times in A and b times in B, it
+   must appear min(a,b) times in the intersection). 
+******* answer 3.4
+Ams = A.map(lambda e: (e, (1, 0)))
+Bms = B.map(lambda e: (e, (0, 1)))
+
+ABms = Ams.union(Bms)
+
+def reduce_func(a, b):
+    Ac1, Bc1 = a
+    Ac2, Bc2 = b
+
+    return Ac1 + Ac2, Bc1 + Bc2
+
+
+ABms = ABms.reduceByKey(reduce_func)
+
+def map_func(v):
+    e, (a, b) = v
+    return e, min(a, b)
+
+IABms = ABms.map(map_func)
+******* end answer 3.4
+
+
+5) Difference (if an element appear a times in A and b times in B, it must
+   appear max(0,a-b) times in the difference)
+******* answer 3.5
+def map_func(v):
+    e, (a, b) = v
+    return e, max(0, a - b)
+
+DABms = ABms.map(map_func)
+******* end answer 3.5
+
+6) Symmetric difference (if an element appear a times in A and b times in
+   B, it must appear max(a,b) - min(a,b) in the symmetric difference)
+******* answer 3.6
+def map_func(v):
+    e, (a, b) = v
+    return e, max(a, b) - min(a, b)
+
+SABms = ABms.map(map_func)
+******* end answer 3.6
+
+

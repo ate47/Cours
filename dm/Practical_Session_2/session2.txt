@@ -1,0 +1,380 @@
+********************************************************************************
+********* Practical Session 2: Datamining For Big Data *************************
+********************************************************************************
+
+The text files used in this practical session are available as an archive on claroline.
+
+You need to complete this file with your answers and upload it in the "M2
+CS Big data (BIG DATA)" course on Claroline connect.
+
+Do not modify or remove lines starting with stars "****". I use them to extract your name and answers.
+Write your answers only between lines "******* answer X.X" and "******* end answer X.X".
+
+****** Fill in your name on the next line  (do not modify or remove this line)
+Antoine Willerval
+****** end name (do not modify or remove this line)
+
+
+****************************************************
+****** TODO
+****************************************************
+Assuming you have unzipped the session2.zip in a directory.
+
+To start this practical session, you should:
+1- open this file 'session2.txt' with a text editor to be able to write your answers in it.
+2- prepare to start the pyspark shell in the terminal:
+  A- If you use your own computer where you have installed spark:
+     - start a terminal in the directory where you have unzipped session2.zip
+     - go to step 4-.
+
+  B- If you have not installed spark on your computer: use a computer of the university:
+    - (this step may not be necessary, on some university computers spark is working and you don't have to connect to mira2)
+      In this case you have to connect to the computer mira2.univ-st-etienne.fr using the ssh command.
+      In a terminal, type (replace your_login with your university login):
+      ssh your_login@mira2.univ-st-etienne.fr
+      (it will ask for your password)
+      Then you are connected to mira2.
+    - From there, you have to copy the session2.zip in your home directory of the university if you have not done it yet:
+      cp /home/jeudbapt/big_data/session2.zip .
+    - then unzip it:
+      unzip session2.zip
+    - then cd into the extracted directory : 
+      cd Practical_Session_2
+
+4- Now, you can start the pyspark shell:
+ (These commands work for those that use the university computers,
+ if you have your own installation of Spark, the path to pyspark binary will be different).
+
+export PYSPARK_PYTHON=python3
+/home/jeudbapt/local/spark-3.0.1-bin-hadoop2.7/bin/pyspark --master local[2]
+
+5- Then to try the pyspark shell, type (in the pyspark shell):
+sc.parallelize(range(50)).collect()
+ It should output the list [1,2,3,....,49]. Otherwise, pyspark is not working.
+
+ In case of error, it may be necessary to type:
+ export SPARK_LOCAL_IP=127.0.0.1
+ in the terminal before launching pyspark.
+
+ remarks: 
+
+   The "--master local[4]" option means that spark is started on the local machine on 4 cores.
+   By default, the pyspark shell may use python version 2.7. The line:
+   export PYSPARK_PYTHON=python3
+   is to use python3.
+
+   To set the log level (for the messages displayed by pyspark), you can type
+   (in the pyspark shell) :
+     sc.setLogLevel("WARN")
+   valid log levels include: ALL, DEBUG, ERROR, FATAL, INFO, OFF, TRACE, WARN
+
+6- you should copy in this file the code that you type in the interactive shell.
+
+7- At the end of the session, upload this file session2.txt on claroline connect (BIG DATA course).
+
+8- If you have not finished at the end of the session, you can continue at home and upload another version
+   later.
+
+********************************************************************************
+***************  Some documentation:
+********************************************************************************
+
+ You will use Spark version 2.3 or higher.
+
+ These versions provide another data structure (DataFrames) in addition to
+ RDDs, but you will use RDD (RDD are less powerful but simpler).
+
+ The Quick Start guide for Spark version >2.1 is mainly focused on
+ DataFrames and not RDDs.
+ Therefore, you will use the Quick start guide of version 2.0.
+
+ The Spark start page (version 2.0):
+ http://spark.apache.org/docs/2.0.0/quick-start.html
+
+ Python 3 tutorial:
+ https://docs.python.org/3/tutorial/index.html
+
+ Spark documentation on RDDs:
+   http://spark.apache.org/docs/latest/rdd-programming-guide.html
+  the available Spark operations on RDDs:
+  - transformations:
+    http://spark.apache.org/docs/latest/rdd-programming-guide.html#transformations
+  - actions:
+    http://spark.apache.org/docs/latest/rdd-programming-guide.html#actions
+
+********************************************************************************
+*********** Part IV: Matrix Operations
+********************************************************************************
+
+In this part, you will compute several operations on matrix / vectors.
+
+Some definitions:
+- The sum of two vectors V = (V1,...,Vn) and W = (W1,...,Wn) is the vector
+  V+W =(V1+W1, V2+W2, ..., Vn+Wn) 
+
+- The dot product of two vectors V = (V1,...,Vn) and W = (W1,...,Wn) is:
+  V.W =  V1*W1 + V2*W2 + ... + Vn*Wn 
+
+- The L2 norm of a vector V is:
+  norm(V) = sqrt(V.V) = sqrt( V1*V1 + V2*V2 + ... + Vn*Vn)
+
+- The product of a matrix M and a vector V is:
+  W = M.V with Wi = M[i,.] * V = sum_j M[i,j].Vj
+  (the ith component of W is the dot product between the ith row of M and V).
+
+******* Sparse representation of matrix and vectors ********************
+
+Examples of matrix and vectors are stored in files M.txt, V.txt and W.txt (in data/ directory).
+They use a sparse coding.
+For a vector X (like V and W), it means that each line of X.txt has the form:
+"i X[i]"
+where i is the row number and X[i] the value of X in at row i.
+For instance, if X is vector [0, 1.3, 0, 2, 4, 0, 0, 1.1], it is represented by a file:
+"2 1.3
+4 2
+5 4
+8 1.1"
+
+We want to represent this vector by a RDD consisting of pairs (i,X[i]), so
+X would be represented by a RDD :
+[(2, 1.3), (4, 2.0), (5, 4.0),...]
+
+Notice that a vector with more 0s at the end like [0, 1.3, 0, 2, 4, 0, 0, 1.1, 0, 0, 0, 0]
+have exactly the same representation (since we only store non-zero values). 
+
+For a matrix, each line of M.txt has the form:
+"i j M[i,j]"
+where i is the row number, j the column number and M[i,j] the value in matrix M at row i column j.
+Only the non zero values M[i,j] are stored in the file.
+
+For instance, if M is the 3x3 matrix: 
+    0   5.3 0
+M = 6.2 0   0
+    0   0   0
+it can be represented by a file with two lines (since there are only two non-zero values):
+"1 2 5.3
+2 1 6.2"
+And the corresponding RDD would be
+[(1, 2, 5.3), (2, 1, 6.2)]
+
+
+******** Questions ****************************************************
+
+1) First, construct three RDDs V, W and M that represent vectors of the
+files V.txt and W.txt and the matrix in M.txt using the sparse
+representation explained above. These three RDDs will be used in the
+other questions.
+
+hint: you can use the int() and float() functions: int("5") is the integer
+5 and float("5.4") is the float value 5.4.
+******* answer 4.1: do not modify or remove this line
+def load_vector(file: str):
+    textFile = sc.textFile(file)
+    def map_func(value):
+        i, v = value.split()
+
+        return int(i), float(v)
+        
+    return textFile.map(map_func)
+
+
+def load_matrix(file: str):
+    textFile = sc.textFile(file)
+
+    def map_func(value):
+        i, j, v = value.split()
+
+        return int(i), int(j), float(v)
+
+    return textFile.map(map_func)
+
+
+V = load_vector("data/V.txt")
+W = load_vector("data/W.txt")
+M = load_matrix("data/M.txt")
+
+******* end answer 4.1: do not modify or remove this line
+
+
+2) The L2 norm of a vector V is norm(V) = sqrt(V1*V1 + V2*V2 + ... +Vn*Vn)
+Compute the L2 norm of V from the RDD V.
+To use the sqrt function, you need to import it using (in the pyspark shell):
+from math import sqrt
+******* answer 4.2: do not modify or remove this line
+def map_func(value):
+    _, v = value
+    return v * v
+
+from operator import add
+
+normV = V.map(map_func).reduce(add) ** 0.5
+******* end answer 4.2: do not modify or remove this line
+
+
+3) We want to compute the vector sum U = V + W.  The vector U must be a RDD
+using the sparse representation.  In particular, if some coordinate of U is
+zero, it should not appear in the RDD (hint: filter operation).
+
+******* answer 4.3: do not modify or remove this line
+from operator import add
+sumU = V.union(W).reduceByKey(add)
+******* end answer 4.3: do not modify or remove this line
+
+
+4) We want to compute the dot product of two vectors
+V.W = V1.W1 + V2.W2 + ... + Vn.Wn
+
+To this aim, you can use the "join" operation between the RDDs V and W
+to group coordinates (ie, V1 with W1, V2 with W2, ...). Then compute the
+dot product.
+
+******* answer 4.4: do not modify or remove this line
+from operator import add
+
+
+def map_func(value):
+    _, (vi, wi) = value
+    return vi * wi
+
+V.join(W).map(map_func).reduce(add)
+******* end answer 4.4: do not modify or remove this line
+
+
+
+Now, we want to compute the matrix vector product T = M.V.
+The vector T must also be represented in a RDD using a sparse coding.
+
+5) First, build a RDD which contains all the (non zero) products of the form
+M[i,j].Vj (you can use the "join" operation on RDDs). Your RDD may also
+contains other information such as row and/or column numbers.
+******* answer 4.5: do not modify or remove this line
+from operator import add
+
+
+def map_func(value):
+    i, v = value
+    return i, v
+
+sumVM = V.map(map_func)
+
+def map_func(value):
+    i, _, v = value
+    return i, v
+
+sumVM = sumVM.join(M.map(map_func))
+
+******* end answer 4.5: do not modify or remove this line
+
+6) From the previous RDD, build the RDD which contains the vector
+W=M.V. Recall that zero values must not appear in this RDD.
+******* answer 4.6: do not modify or remove this line
+def map_func(value):
+    i, (v, m) = value
+    return i, m * v
+
+
+sumVM = sumVM.map(map_func)
+sumVM = sumVM.reduceByKey(add)
+******* end answer 4.6: do not modify or remove this line
+
+7) (optional) write a program that computes the largest eigenvalue of matrix M. 
+
+One possible algorithm is the power iteration method:
+Start from a random vector V_0 and compute the two sequences of vectors V_1, V_2 .... and NV_1, NV_2 ...
+(each V_i and each NV_i is a vector represented in a RDD)
+
+NV_i = V_i/norm(V_i)  # normalize vector V_i
+V_(i+1) = M.NV_i      # compute new vector V_(i+1)
+
+Then the dot product 
+l = V_(i+1).NV_i
+will converge towards the eigenvalue of M with the largest norm when i goes to infinity.
+You can print the l value at each iteration to see the convergence.
+
+******* answer 4.7: do not modify or remove this line
+from operator import add
+
+
+def norm(V) -> float:
+    def map_func(value):
+        _, v = value
+        return v * v
+
+    return V.map(map_func).reduce(add) ** 0.5
+
+def matrix_mult(M, V):
+    def map_func(value):
+        i, v = value
+        return i, v
+
+    sumVM = V.map(map_func)
+
+    def map_func(value):
+        i, _, v = value
+        return i, v
+
+    sumVM = sumVM.join(M.map(map_func))
+
+    def map_func(value):
+        i, (v, m) = value
+        return i, m * v
+
+
+    sumVM = sumVM.map(map_func)
+    return sumVM.reduceByKey(add)
+
+def dot_product(V, W):
+    def map_func(value):
+        _, (vi, wi) = value
+        return vi * wi
+
+    return V.join(W).map(map_func).reduce(add)
+
+Vi = V
+
+i = 0
+
+while True:
+    i += 1
+    
+    normV = norm(Vi)
+
+    def map_func(value):
+        i, v = value
+        return i, v / normV
+    
+    NVi = Vi.map(map_func)
+
+    Vi = matrix_mult(M, NVi)
+
+    l = dot_product(Vi, NVi)
+
+    print("For i =", i,"  l =", l)
+    
+
+******* end answer 4.7: do not modify or remove this line
+
+If you want to write a standalone program, copy the following code in a file eigen.py
+and start it by:
+<PATH_TO_SPARK_INSTAL>/bin/spark-submit eigen.py
+or 
+<PATH_TO_SPARK_INSTAL>/bin/spark-submit eigen.py 2> /dev/null
+to completely avoid any messages from spark
+
+############################################### start of file eigen.py
+from pyspark import SparkContext, SparkConf
+
+# To start this spark program:
+# <PATH_TO_SPARK_INSTAL>/bin/spark-submit eigen.py  
+
+#### Create the Spark Context and start Spark:
+myconf = SparkConf().setAppName("eigenvalue")
+sc = SparkContext(conf=myconf)
+sc.setLogLevel("WARN") # to avoid too many messages
+#### Spark context created.
+
+# write your code here
+
+# stop Spark:
+sc.stop()
+############################################### end of file eigen.py
