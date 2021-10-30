@@ -1,6 +1,6 @@
 # Cours
 
-lol, who are you?
+This repo contains notes or practicals to some courses.
 
 - [Recherche info](ri/README.md)
 - [Multi Agent System Coordination](mas/README.md)
