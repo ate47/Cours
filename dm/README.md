@@ -14,6 +14,14 @@ python -m venv .venv
 python -m pip -r requirements.txt
 ```
 
+Maybe this command can help
+
+
+```powershell
+$env:PYSPARK_PYTHON="python"
+```
+
+
 ## Unix (Bash)
 
 ```bash
