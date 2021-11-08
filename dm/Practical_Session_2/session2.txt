@@ -250,30 +250,27 @@ contains other information such as row and/or column numbers.
 ******* answer 4.5: do not modify or remove this line
 from operator import add
 
-
 def map_func(value):
-    i, v = value
-    return i, v
+    i, j, v = value
+    return j, (i, v)
 
-sumVM = V.map(map_func)
 
-def map_func(value):
-    i, _, v = value
-    return i, v
-
-sumVM = sumVM.join(M.map(map_func))
+sumVM = V.join(M.map(map_func))
 
 ******* end answer 4.5: do not modify or remove this line
 
 6) From the previous RDD, build the RDD which contains the vector
 W=M.V. Recall that zero values must not appear in this RDD.
 ******* answer 4.6: do not modify or remove this line
+from operator import add
+
 def map_func(value):
-    i, (v, m) = value
-    return i, m * v
+    _, (v, (i, m)) = value
+    return i, (m * v)
 
 
 sumVM = sumVM.map(map_func)
+
 sumVM = sumVM.reduceByKey(add)
 ******* end answer 4.6: do not modify or remove this line
 
@@ -304,23 +301,18 @@ def norm(V) -> float:
 
 def matrix_mult(M, V):
     def map_func(value):
-        i, v = value
-        return i, v
-
-    sumVM = V.map(map_func)
-
+        i, j, v = value
+        return j, (i, v)
+      
+    sumVM = V.join(M.map(map_func))
+    
     def map_func(value):
-        i, _, v = value
-        return i, v
-
-    sumVM = sumVM.join(M.map(map_func))
-
-    def map_func(value):
-        i, (v, m) = value
-        return i, m * v
-
-
+        j, (v, (i, m)) = value
+        return i, (m * v)
+    
     sumVM = sumVM.map(map_func)
+    sumVM.collect()
+    
     return sumVM.reduceByKey(add)
 
 def dot_product(V, W):
