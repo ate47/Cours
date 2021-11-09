@@ -314,22 +314,17 @@ def norm(V) -> float:
     def map_func(value):
         _, v = value
         return v * v
-
     return V.map(map_func).reduce(add) ** 0.5
 
 def matrix_mult(M, V):
     def map_func(value):
         i, j, v = value
         return j, (i, v)
-      
     sumVM = V.join(M.map(map_func))
-    
     def map_func(value):
         j, (v, (i, m)) = value
         return i, (m * v)
-    
     sumVM = sumVM.map(map_func)
-    sumVM.collect()
     
     return sumVM.reduceByKey(add).filter(filter_func)
 
@@ -337,8 +332,8 @@ def dot_product(V, W):
     def map_func(value):
         _, (vi, wi) = value
         return vi * wi
-
     return V.join(W).map(map_func).reduce(add)
+
 
 Vi = V
 
