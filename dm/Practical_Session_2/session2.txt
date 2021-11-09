@@ -218,6 +218,13 @@ zero, it should not appear in the RDD (hint: filter operation).
 ******* answer 4.3: do not modify or remove this line
 from operator import add
 sumU = V.union(W).reduceByKey(add)
+
+def filter_func(value):
+    _, v = value
+    return v != 0
+
+sumU = sumU.filter(filter_func)
+
 ******* end answer 4.3: do not modify or remove this line
 
 
@@ -272,6 +279,13 @@ def map_func(value):
 sumVM = sumVM.map(map_func)
 
 sumVM = sumVM.reduceByKey(add)
+
+def filter_func(value):
+    _, v = value
+    return v != 0
+
+sumVM = sumVM.filter(filter_func)
+
 ******* end answer 4.6: do not modify or remove this line
 
 7) (optional) write a program that computes the largest eigenvalue of matrix M. 
@@ -291,6 +305,10 @@ You can print the l value at each iteration to see the convergence.
 ******* answer 4.7: do not modify or remove this line
 from operator import add
 
+
+def filter_func(value):
+    _, v = value
+    return v != 0
 
 def norm(V) -> float:
     def map_func(value):
@@ -313,7 +331,7 @@ def matrix_mult(M, V):
     sumVM = sumVM.map(map_func)
     sumVM.collect()
     
-    return sumVM.reduceByKey(add)
+    return sumVM.reduceByKey(add).filter(filter_func)
 
 def dot_product(V, W):
     def map_func(value):
