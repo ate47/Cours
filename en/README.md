@@ -20,7 +20,8 @@ marp diapo.md
 ```
 
 - [Video](https://www.youtube.com/watch?v=2lv6Vs12jLc)
-- [Diapo](diapo.md)
+- [Diapo file](diapo.md)
+- [Diapo web](https://ate47.github.io/Cours/en/diapo.html)
 
 ### Sources
 
