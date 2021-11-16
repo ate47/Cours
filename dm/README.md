@@ -11,21 +11,19 @@ Create env and install packages
 ```powershell
 python -m venv .venv
 .venv/Scripts/activate.ps1
-python -m pip -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 Maybe this command can help
 
-
 ```powershell
 $env:PYSPARK_PYTHON="python"
 ```
-
 
 ## Unix (Bash)
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-python -m pip -r requirements.txt
+python -m pip install -r requirements.txt
 ```
