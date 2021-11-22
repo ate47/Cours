@@ -39,8 +39,19 @@ skill(plumbing).
     for (client(Client, LimitCompany)) {
       // Q: requests to the client what is its acceptable delay
       //    (i.e., delay_limit belief) to perform the assigned task
-      .send(Client, askOne, delay_limit(X));
-    }
+      .send(Client, askOne, delay_limit(X), delay_limit(L));
+      // use the sync version to be sure all the delay_limit are here before the end
+      +delay_limit(L)[source(Client)];
+    };
+    // Update the companyQ1.asl file so that the company sends a delay request to 
+    // all clients and choose the client with greatest delay_limit
+    .findall(
+      delay_limit(LimitClient)[source(Client)], 
+      delay_limit(LimitClient)[source(Client)],
+      ListClient
+    );
+    .max(ListClient, delay_limit(LimitClient)[source(Client)]);
+    println("I choose ", Client, " his delay_limit is ", LimitClient);
     .
 
 { include("$jacamoJar/templates/common-cartago.asl") }
