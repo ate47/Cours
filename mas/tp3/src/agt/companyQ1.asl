@@ -1,9 +1,12 @@
 // Agent companyQ1
 
 /* Initial beliefs and rules */
+// client(c, v): allocation of v time units to the client c (Initial belief)
 client(giacomo, 20).
 client(andrei, 30).
+// ????
 skill(plumbing).
+// delay_limit(d): maximum delay tolerance of d time units for the execution of a task (Received belief)
 /* Initial goals */
 
 /* Plans */
@@ -15,16 +18,20 @@ skill(plumbing).
 
 +!start : true
   <- 
-    for (client(Ag, Lc)) {
-      // requests to the client what is its acceptable delay (i.e., delay_limit belief, wtf in english?) to perform the assigned task
-      .send(Ag, askOne, delay_limit(X), delay_limit(L));
-      if ( L > Lc ) {
-        // if the delay limit is greater than the delay needed by the company, then request the delay to the client
-        // delay already in delay_limit(L) so useless to request it? TODO: check
-      } elif ( L < Lc  ) {
-        // if the delay limit is less than the delay needed by the company, print an error message informing failure in completing the task
-        println("Can't complete the task for ", Ag, ", the delay needed by the company is too important Client=", L, " < Company=", Lc);
-      } // no = case asked
+    for (client(Client, LimitCompany)) {
+      // Q: requests to the client what is its acceptable delay (i.e., delay_limit belief, wtf in english?) to perform the assigned task
+      .send(Client, askOne, delay_limit(X), delay_limit(LimitClient));
+      
+      // add delay limit to belief base (sync behavior)
+      +delay_limit(LimitClient)[source(Client)];
+
+      if (LimitClient > LimitCompany) {
+        // Q: if the delay limit is greater than the delay needed by the company, then request the delay to the client (???)
+        .send(Client, tell, delay(LimitCompany));
+      } elif (LimitClient < LimitCompany) {
+        // Q: if the delay limit is less than the delay needed by the company, print an error message informing failure in completing the task
+        println("Can't complete the task for ", Client, ", the delay needed by the company is too important Client=", LimitClient, " < Company=", LimitCompany);
+      }; // no = case asked
     };
     .
 
