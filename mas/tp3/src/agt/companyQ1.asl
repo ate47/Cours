@@ -22,18 +22,23 @@ skill(plumbing).
 +delay_limit(LimitCompany)[source(Client)]
   <-
       if (LimitClient > LimitCompany) {
-        // Q: if the delay limit is greater than the delay needed by the company, then request the delay to the client (???)
+        // Q: if the delay limit is greater than the delay needed by the company, 
+        //    then request the delay to the client (???)
         .send(Client, tell, delay(LimitCompany));
       } elif (LimitClient < LimitCompany) {
-        // Q: if the delay limit is less than the delay needed by the company, print an error message informing failure in completing the task
-        println("Can't complete the task for ", Client, ", the delay needed by the company is too important Client=", LimitClient, " < Company=", LimitCompany);
+        // Q: if the delay limit is less than the delay needed by the company, 
+        //    print an error message informing failure in completing the task
+        println("Can't complete the task for ", Client, 
+                ", the delay needed by the company is too important Client=", 
+                LimitClient, " < Company=", LimitCompany);
       } // no = case asked
       .
 
 +!start : true
   <- 
     for (client(Client, LimitCompany)) {
-      // Q: requests to the client what is its acceptable delay (i.e., delay_limit belief, wtf in english?) to perform the assigned task
+      // Q: requests to the client what is its acceptable delay
+      //    (i.e., delay_limit belief) to perform the assigned task
       .send(Client, askOne, delay_limit(X));
     }
     .
