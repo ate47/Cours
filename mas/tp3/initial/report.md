@@ -2,6 +2,7 @@
 
 ## Links
 
+- [Eclipse .gitignore](https://github.com/github/gitignore/blob/master/Global/Eclipse.gitignore) and [Gradle .gitignore](https://github.com/github/gitignore/blob/master/Gradle.gitignore) (can be useful to the reader)
 - [Course](https://ci.mines-stetienne.fr/cps2/mac/)
 - [Practical 3](https://ci.mines-stetienne.fr/cps2/mac/usecase-interaction-centric.html)
 
