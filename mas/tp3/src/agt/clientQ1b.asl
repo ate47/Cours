@@ -1,4 +1,5 @@
 // Agent clientQ1b
+{ include("common_clientQ1.asl") }
 
 /* Initial beliefs and rules */
 delay_limit(20).
