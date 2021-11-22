@@ -4,7 +4,7 @@
 # Practicals
 
 - [TP2](tp2/README.md)
-- [TP3](tp3/initial/README.md)
+- [TP3](tp3/README.md)
 
 ## Remove useless files
 
