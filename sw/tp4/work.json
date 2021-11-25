@@ -1,0 +1,21 @@
+{
+  "@context": {
+    "publisher": "http://purl.org/dc/terms/publisher",
+    "publicationDate": {
+      "@id": "http://purl.org/dc/terms/issued",
+      "@type": "http://www.w3.org/2001/XMLSchema#date"
+    },
+    "title": "http://purl.org/dc/terms/title",
+    "usefulLinks": {
+      "@id": "http://xmlns.com/foaf/0.1/isPrimarySubjectOf",
+      "@type": "@id"
+    },
+    "ref": "@id",
+    "@base": "http://www.wikidata.org/entity/"
+  },
+  "ref": "Q13912",
+  "publisher": "Harper & Raw",
+  "publicationDate": "1963-11-13",
+  "title": "Where the Wild Things Are",
+  "usefulLinks": ["https://en.wikipedia.org/wiki/Where_the_Wild_Things_Are"]
+}

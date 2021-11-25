@@ -1,0 +1,131 @@
+# example
+
+Q2.
+nature de l'élément (P31)
+cet élément est un exemple spécifique de cette classe qui en précise la nature. Ne pas confondre avec la propriété P279 (sous-classe de)
+
+chat domestique (Q146)
+espèce de mammifères de la famille des félidés
+
+Q3.
+Q11748378
+
+Q4.
+14
+
+Q5.
+The GPS location is get with a Point(lat,lon) structure
+
+Q6.
+
+SELECT, WHERE, LIMIT
+
+# query
+
+Q1.
+https://www.wikidata.org/entity/Q42716
+
+Q2.
+SELECT ?type 
+WHERE {
+  wd:Q42716 wdt:P31 ?type
+}
+wd:Q484170
+
+Q3.
+SELECT (count(?type) as ?nb)
+WHERE {
+  wd:Q42716 wdt:P31/wdt:P279* ?type
+} 
+165
+
+Q4.
+
+SELECT ?com
+WHERE {
+  ?com wdt:P31 wd:Q484170
+}
+
+Q5
+
+SELECT ?com ?nb
+WHERE {
+  ?com wdt:P31 wd:Q484170 ;
+       wdt:P1082 ?nb
+}
+
+Q6
+SELECT ?com ?nb
+WHERE {
+  ?com wdt:P31 wd:Q484170 ;
+       wdt:P1082 ?nb .
+  FILTER (?nb >= 100000)
+}
+ORDER BY DESC(?nb)
+
+Q7
+
+SELECT (SUM(?pop) as ?popTot)
+WHERE
+{
+  ?com wdt:P131 [
+      wdt:P131 wd:Q463
+  ]  ;
+       wdt:P1082 ?pop ;
+       wdt:P31 wd:Q484170
+}
+
+Q8
+
+#defaultView:ImageGrid
+SELECT ?img
+WHERE
+{
+  ?com wdt:P131 [
+      wdt:P131 wd:Q463
+  ] ;
+       wdt:P31 wd:Q484170 .
+  OPTIONAL {
+    ?com wdt:P18 ?img .
+  }
+}
+
+# more challenges
+
+Q1 
+SELECT  ?hum
+WHERE
+{
+  ?hum wdt:P166 wd:Q38104 ;
+       wdt:P31 wd:Q5 ;
+       wdt:P27 ?country .
+  ?country wdt:P30 wd:Q46 .
+}
+
+Q2 - 1
+SELECT ?spouse
+WHERE
+{
+  ?pre wdt:P39 wd:Q11696     ; # usa p
+       wdt:P1196 wd:Q149086  ; # homicide
+       wdt:P26 ?spouse       .
+  FILTER NOT EXISTS {
+    ?spouse wdt:P570 ?death
+  }
+}
+
+Q2 - 2
+SELECT ?spouse
+WHERE
+{
+  ?pret wdt:P279 [
+       wdt:P279 wd:Q30461
+    ]. # president type
+  ?pre wdt:P39 ?pret     ; # president
+       wdt:P1196 wd:Q149086  ; # homicide
+       wdt:P26 ?spouse       .
+  FILTER NOT EXISTS {
+    ?spouse wdt:P570 ?death
+  }
+}
+

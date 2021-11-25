@@ -1,0 +1,11 @@
+@prefix aw: <https://antoine-willerval.fr/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+
+
+aw:me a foaf:Person .
+
+aw:me foaf:name "Antoine Willerval" ;
+      foaf:gender: "male" .
+

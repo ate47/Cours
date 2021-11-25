@@ -1,0 +1,33 @@
+Ex1
+```
+SELECT ?weapon
+WHERE
+{
+  ?weapon wdt:P31 [
+    wdt:P279 [
+      wdt:P279 wd:Q728  
+    ]
+  ]
+}
+```
+
+Ex2
+```
+SELECT ?building ?height
+WHERE
+{
+  ?building wdt:P31 wd:Q11303.
+  ?building wdt:P2048 ?height.
+  FILTER (?height > 300)
+}
+```
+
+Ex3
+```
+SELECT (avg(?elev) as ?elev_avg)
+WHERE
+{
+  ?m wdt:P31 wd:Q8502 ;
+     wdt:P2044 ?elev.
+}
+```

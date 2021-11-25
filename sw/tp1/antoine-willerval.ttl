@@ -1,0 +1,11 @@
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex: <http://example.com/> .
+
+@prefix cd: <http://193.49.165.77:8083/clement-defretiere/> .
+
+<>  a ex:Person ;
+    ex:name "Antoine Willerval" ;
+    ex:desc "Computer science student" ;
+    ex:friend cd: ;
+    ex:hasLeftNeighbour "Alexandre Martin" ;
+    ex:hasRearNeighbour "Mohamed Komah" .

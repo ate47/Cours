@@ -1,0 +1,61 @@
+# Part 1
+
+## 1
+
+Tim Berners-Lee's about data
+
+## 2
+
+```TURTLE
+
+dbr:Tim_Berners-Lee dbo:wikiPageID "30034"^^xsd:integer ;
+                    dbo:wikiPageLength "47052"^^xsd:nonNegativeInteger ;
+                    dbo:wikiPageRevisionID "1023987131"^^xsd:integer .
+```
+
+## 3
+
+the birth date of a dbo:Person (person)
+
+## 4
+
+Sir Timothy ... which appeared in LCD lights attached to the chairs of the audience. He received the 2016 Turing Award "for inventing the World Wide Web, the first web browser, and the fundamental protocols and algorithms allowing the Web to scale"
+
+dbo:abstract
+
+## 5
+
+It can be an URL, the link will open the URL.
+
+Or it can be a property, the link will open the web page of the property
+
+## 6
+
+?
+
+## 7
+
+?
+
+## 8
+
+130279, the type of the literal, here xsd:integer
+
+# Part 2
+
+```TURTLE
+
+@prefix aw: <https://antoine-willerval.fr/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+
+
+aw:me a foaf:Person .
+
+aw:me foaf:name "Antoine Willerval" ;
+      foaf:gender: "male" .
+
+
+
+```

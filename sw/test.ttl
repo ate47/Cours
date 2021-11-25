@@ -1,0 +1,80 @@
+
+
+# Prefix of namespaces
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <https://www.w3.org/2001/XMLSchema#> .
+@prefix ex: <http://example.com> .
+
+# rule in turtle subject, predicate, object
+
+ex:mic ex:worksFor ex:ujm .
+
+# /!\ preferable to use website URL to denote website and note object of the website
+
+
+# Literal
+
+ex:mic ex:name "Michel"^^xsd:string .
+ex:mic ex:birthdate ""^^xsd:date .
+ex:mic ex:etablishedIn "1891"^^xsd:gYear .
+
+# Define websites:
+ex:mic ex:homepage <http://michel.fr> .
+# Or 
+ex:mic ex:homepage "http://michel.fr"^^xsd:anyURI .
+# Difference: in the 2nd, we are sure to have an URI
+
+
+# ; same subject (this thing is the same as the 18th lines)
+ex:mic ex:name "Michel"^^xsd:string ;
+       ex:birthdate ""^^xsd:date ;
+       ex:etablishedIn "1891"^^xsd:gYear .
+
+# instead of using the same predicate/subject, use a ,
+
+ex:mic ex:name "Michel"^^xsd:string.
+ex:mic ex:name "Oscar"^^xsd:string.
+
+# Can be converted into
+
+ex:mic ex:name "Michel"^^xsd:string , 
+               "Oscar"^^xsd:string .
+
+# To restart: "." end / ";" repeat subject / "," repeat subject+predicate
+
+
+# xsd:int has a maximum value, not xsd:integer, so use xsd:integer
+
+ex:session-semweb1 ex:number 34 .
+ex:session-semweb1 ex:number_float 33.5 .
+
+
+# Blank node (object position)
+
+ex:session-semweb1 ex:hasSlideShow [ 
+    ex:hasTitle "semantic web"@en , 
+                "web sémantique"@fr ;
+    ex:hasNBSlide 12
+] .
+
+# Blank node (subject position)
+
+[
+    ex:prop ex:x
+] ex:something ex:thing .
+
+# Is the same as
+
+[] ex:something ex:thing ;
+   ex:prop ex:x .
+
+
+
+# Say a thing is another thing
+
+ex:mic a ex:Person , 
+         ex:Man .
+# Same as
+ex:mic rdf:type ex:Person , 
+                ex:Man .

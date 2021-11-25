@@ -1,0 +1,154 @@
+# Practical
+
+## Observing deployed JSON-LD
+
+### Q1
+
+```json
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "@id": "https://www.discogs.com/label/41291-Semantic",
+  "name": "Semantic",
+  "image": "https://img.discogs.com/mppPGlkRSJBQ7VbOokpY9G7kC4g=/fit-in/249x77/filters:strip_icc():format(jpeg):mode_rgb():quality(90)/discogs-images/L-41291-1578737977-3558.png.jpg",
+  "description": "SEMANTIC was a label &amp; distribution company, based in France (Nancy), from 1991 to 1998. SEMANTIC was the distribution company for France of international labels such as Domino, Big Cat, KK records, Grey Aera Of Mute, Sub Pop (vinyls only), Amphetamine Reptile, Hyperium, Recrec, Danse Macabre, WSFA, Rough Trade Germany &amp; many more. Originall co-founded by Philippe Saintlos (Odessa &amp; UBAHN), G\u00e9rard Nguyen (Les Disques du Soleil et de l'Acier), Richard Franoux (Permis de Construire) &amp; Dominique R\u00e9p\u00e9caud (33REVpermi). . ",
+  "Offers": {
+    "@type": "AggregateOffer",
+    "availability": "http://schema.org/InStock",
+    "offerCount": 1338
+  }
+}
+```
+
+An "Organization" named "Semantic"
+
+### Q2
+
+the line
+
+```json
+"availability": "http://schema.org/OutOfStock",
+```
+
+provide us that the product is out of stock, so the product isn't available for sale.
+
+### Q3
+
+a "Recipe".
+
+```TURTLE
+<> a ex:recipe ;
+   ex:image "https://img.jamieoliver.com/jamieoliver/recipe-database/105860262.jpg?tr=w-450" ;
+   ex:name "Simple chocolate tart" ;
+   ex:recipeCategory "Desserts" ;
+   ex:recipeCategory "Desserts";
+   ex:description "This chocolate tart is great for those chocofreaks who turn up out of the blue, as it is dead quick to make. I think this particular tart cries out for a slightly thicker pastry shell. The better the chocolate you can buy, the tastier it will be." ;
+   ex:recipeYield "16" ;
+   ex:recipeIngredient "300 ml double cream ",
+                       "2 level tablespoons caster sugar ",
+                       "400 g quality dark chocolate (70%)",
+                       "90 g unsalted butter at room temperature",
+                       "100 ml milk ",
+                       "1  <a href=\"https://www.jamieoliver.com/recipes/egg-recipes/shortcrust-sweet-pastry/\">tart shell</a> baked blind",
+                       "  quality cocoa powder for dusting";
+   ex:recipeInstructions "<ol class=\"recipeSteps\"><li>Place the double cream, sugar and a tiny pinch of sea salt in a pan and bring to the boil. </li><li>Break up the chocolate. </li><li>As soon as the mixture has boiled, remove from the heat and add the butter and chocolate. Stir until it has completely melted. Allow the mixture to cool slightly, stirring in the cold milk until smooth and shiny. </li><li>Sometimes this mixture looks like it has split. Allow to cool down a bit more and whisk in a little extra cold milk until smooth.</li><li>Scrape all the mixture into the cooked and cooled <a href=\"https://www.jamieoliver.com/recipes/egg-recipes/shortcrust-sweet-pastry/\">pastry shell</a> with a spatula. </li><li>Shake the tart to even it out and allow to cool for around 1 to 2 hours until it is at room temperature. Dust with the cocoa powder. </li><li>Ultimately the pastry should be short and crisp and the filling should be smooth and should cut like butter.</li></ol>";
+   ex:keywords "sweets and desserts",
+               "chocolate",
+               "tart",
+               "pastry",
+               "the naked chef",
+               "chocolate tart",
+               "Chocolate",
+               "Puddings &amp",
+               "desserts",
+               "baking and desserts",
+               "dessert",
+               "desserts";
+   ex:author "Jamie Oliver";
+   ex:nutrition [
+       a NutritionInformation ;
+       ex:calories "436 calories" ;
+       ex:fatContent "32.9 g fat" ;
+       ex:saturatedFatContent "20.0 g saturated fat" ;
+       ex:proteinContent "4.8 g protein" ;
+       ex:carbohydrateContent "30.2 g carbohydrate" ;
+       ex:sugarContent "16.4 g sugar" ;
+       ex:sodiumContent "0.1 g salt" ;
+       ex:fiberContent "3.6 g fibre" ;
+   ] ;
+   ex:datePublished "2019-03-29"^^xsd:date .
+```
+
+### Q4
+
+https://schema.org/docs/schemas.html
+
+792
+
+## Write a context for existing JSON files
+
+```json
+{
+  "@context": {
+    "Title": "http://schema.org/name",
+    "Year": "http://schema.org/date",
+    "Rated": "http://schema.org/contentRating",
+    "Released": "http://schema.org/Date",
+    "Runtime": "http://schema.org/Duration",
+    "Genre": "http://schema.org/Genre",
+    "Director": "http://schema.org/director",
+    "Writer": "http://schema.org/creator",
+    "Actors": "http://schema.org/actor",
+    "Plot": "http://schema.org/abstract",
+    "Language": "http://schema.org/inLanguage",
+    "Country": "http://schema.org/countryOfOrigin",
+    "Awards": "http://schema.org/award",
+    "Poster": {
+      "@id": "http://schema.org/thumbnailUrl",
+      "@type": "@id"
+    },
+    "Ratings": {
+      "@id": "http://schema.org/contentRating",
+      "@context": {
+        "Source": "https://schema.org/author",
+        "Value": "https://schema.org/ratingValue"
+      }
+    }
+  }
+}
+```
+
+## Writing JSON-LD using Schema.org
+
+The previous turtle code was
+
+```turtle
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex: <http://example.com/> .
+
+@prefix cd: <http://193.49.165.77:8083/clement-defretiere/> .
+
+<>  a ex:Person ;
+    ex:name "Antoine Willerval" ;
+    ex:desc "Computer science student" ;
+    ex:friend cd: ;
+    ex:hasLeftNeighbour "Alexandre Martin" ;
+    ex:hasRearNeighbour "Mohamed Komah" .
+
+```
+
+```json
+{
+  "@context": "http://schema.org/",
+  "@type": "Person",
+  "name": "Antoine Willerval",
+  "jobTitle": "Computer science student",
+  "knows": [
+    {
+      "@id": "http://193.49.165.77:8083/clement-defretiere/"
+    },
+    "Alexandre Martin",
+    "Mohamed Komah"
+  ]
+}
+```

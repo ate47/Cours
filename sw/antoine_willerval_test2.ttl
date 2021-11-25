@@ -1,0 +1,21 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <https://www.w3.org/2001/XMLSchema#> .
+@prefix ex: <http://example.com/> .
+
+# Ken Jenning got an M.Sc. from Columbia University in 1989, 
+# and a Ph.D from MIT in 1994. He has a friend who works for Google
+
+ex:ken_jenning ex:name "Ken Jenning" ;
+               ex:degree [
+                        ex:degreeType "M.Sc." ;
+                        ex:degreeFrom "Columbia University" ;
+                        ex:degreeObtained "1989"^^xsd:gYear
+                    ] ,
+                         [
+                        ex:degreeType "PhD" ;
+                        ex:degreeFrom "MIT" ;
+                        ex:degreeObtained "1994"^^xsd:gYear
+                    ] ;
+               ex:knows [
+                    ex:work "Google"
+                ] .
