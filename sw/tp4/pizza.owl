@@ -63,6 +63,14 @@ based on their toppings.""" .
 
 
 #################################################################
+#    Data properties
+#################################################################
+
+###  http://www.pizza.com/ontologies/pizza.owl#hasCalorificContentValue
+:hasCalorificContentValue rdf:type owl:DatatypeProperty .
+
+
+#################################################################
 #    Classes
 #################################################################
 
@@ -129,6 +137,19 @@ based on their toppings.""" .
              owl:disjointWith :ThinAndCrispyBase .
 
 
+###  http://www.pizza.com/ontologies/pizza.owl#FourCheesePizza
+:FourCheesePizza rdf:type owl:Class ;
+                 owl:equivalentClass [ owl:intersectionOf ( :Pizza
+                                                            [ rdf:type owl:Restriction ;
+                                                              owl:onProperty :hasTopping ;
+                                                              owl:qualifiedCardinality "4"^^xsd:nonNegativeInteger ;
+                                                              owl:onClass :CheeseTopping
+                                                            ]
+                                                          ) ;
+                                       rdf:type owl:Class
+                                     ] .
+
+
 ###  http://www.pizza.com/ontologies/pizza.owl#GreenPepperTopping
 :GreenPepperTopping rdf:type owl:Class ;
                     rdfs:subClassOf :PepperTopping .
@@ -142,6 +163,18 @@ based on their toppings.""" .
 ###  http://www.pizza.com/ontologies/pizza.owl#Hot
 :Hot rdf:type owl:Class ;
      rdfs:subClassOf :SpicinessValuePartition .
+
+
+###  http://www.pizza.com/ontologies/pizza.owl#InterestingPizza
+:InterestingPizza rdf:type owl:Class ;
+                  owl:equivalentClass [ owl:intersectionOf ( :Pizza
+                                                             [ rdf:type owl:Restriction ;
+                                                               owl:onProperty :hasTopping ;
+                                                               owl:minCardinality "3"^^xsd:nonNegativeInteger
+                                                             ]
+                                                           ) ;
+                                        rdf:type owl:Class
+                                      ] .
 
 
 ###  http://www.pizza.com/ontologies/pizza.owl#JalapenoPepperTopping
@@ -358,6 +391,22 @@ based on their toppings.""" .
                                                                    )
                                                      ]
                                  ] .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://www.pizza.com/ontologies/pizza.owl#Example-Margherita
+:Example-Margherita rdf:type owl:NamedIndividual ,
+                             :MargheritaPizza ;
+                    :hasCalorificContentValue 263 .
+
+
+###  http://www.pizza.com/ontologies/pizza.owl#QuattroFormaggio
+:QuattroFormaggio rdf:type owl:NamedIndividual ,
+                           :FourCheesePizza ;
+                  :hasCalorificContentValue 723 .
 
 
 #################################################################

@@ -1,2 +1,1 @@
-ON ETAIT AU TRUC 41 ET CA MARCHAIT PAS
-(wesh)
+ON ETAIT AU TRUC 48 ET CA MARCHAIT https://emse.fr/~zimmermann/Teaching/SemWeb/ProtegeTutorial.pdf
