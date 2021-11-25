@@ -14,7 +14,7 @@ mas house_building {
    }
 
    // builder agents (see their code for details)
-   agent companyA : companyQ1 {  
+   agent companyA : companyQ1.asl {  
       focus: site.housegui
    }
 
