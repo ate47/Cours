@@ -33,20 +33,23 @@ public class Start {
                 // geo ns
                 .setNsPrefix("geo", GEO_NAMESPACE);
 
+        var latProperty = model.createProperty(GEO_NAMESPACE + "lat");
+        var longProperty = model.createProperty(GEO_NAMESPACE + "long");
+        var spatialThing = model.createResource(GEO_NAMESPACE + "SpatialThing");
+
         // read the file
         var reader = new CSVReader<>(STOP_FILE, StopData::new);
         reader.readFile(sdata -> {
             // create resource for the line
             model.createResource(EXT_NAMESPACE + sdata.stopId)
                     // set type
-                    .addProperty(RDF.type, model.createResource(GEO_NAMESPACE + "SpatialThing")) // a geo:SpacialThing
+                    .addProperty(RDF.type, spatialThing) // a geo:SpacialThing
                     // add label of the stop
                     .addProperty(RDFS.label, sdata.stopName)
                     // longitude
-                    .addProperty(model.createProperty(GEO_NAMESPACE + "lat"), sdata.stopLat, XSDGenericType.XSDdecimal)
+                    .addProperty(latProperty, sdata.stopLat, XSDGenericType.XSDdecimal)
                     // latitude
-                    .addProperty(model.createProperty(GEO_NAMESPACE + "long"), sdata.stopLon,
-                            XSDGenericType.XSDdecimal);
+                    .addProperty(longProperty, sdata.stopLon, XSDGenericType.XSDdecimal);
 
         });
 
