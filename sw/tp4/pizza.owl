@@ -160,6 +160,23 @@ based on their toppings.""" .
             rdfs:subClassOf :MeatTopping .
 
 
+###  http://www.pizza.com/ontologies/pizza.owl#HighCaloriePizza
+:HighCaloriePizza rdf:type owl:Class ;
+                  owl:equivalentClass [ owl:intersectionOf ( :Pizza
+                                                             [ rdf:type owl:Restriction ;
+                                                               owl:onProperty :hasCalorificContentValue ;
+                                                               owl:someValuesFrom [ rdf:type rdfs:Datatype ;
+                                                                                    owl:onDatatype xsd:integer ;
+                                                                                    owl:withRestrictions ( [ xsd:minInclusive 400
+                                                                                                           ]
+                                                                                                         )
+                                                                                  ]
+                                                             ]
+                                                           ) ;
+                                        rdf:type owl:Class
+                                      ] .
+
+
 ###  http://www.pizza.com/ontologies/pizza.owl#Hot
 :Hot rdf:type owl:Class ;
      rdfs:subClassOf :SpicinessValuePartition .
@@ -184,6 +201,23 @@ based on their toppings.""" .
                                          owl:onProperty :hasSpiciness ;
                                          owl:someValuesFrom :Hot
                                        ] .
+
+
+###  http://www.pizza.com/ontologies/pizza.owl#LowCaloriePizza
+:LowCaloriePizza rdf:type owl:Class ;
+                 rdfs:subClassOf [ owl:intersectionOf ( :Pizza
+                                                        [ rdf:type owl:Restriction ;
+                                                          owl:onProperty :hasCalorificContentValue ;
+                                                          owl:someValuesFrom [ rdf:type rdfs:Datatype ;
+                                                                               owl:onDatatype xsd:integer ;
+                                                                               owl:withRestrictions ( [ xsd:maxExclusive 400
+                                                                                                      ]
+                                                                                                    )
+                                                                             ]
+                                                        ]
+                                                      ) ;
+                                   rdf:type owl:Class
+                                 ] .
 
 
 ###  http://www.pizza.com/ontologies/pizza.owl#MargheritaPizza
@@ -259,6 +293,10 @@ based on their toppings.""" .
        rdfs:subClassOf [ rdf:type owl:Restriction ;
                          owl:onProperty :hasBase ;
                          owl:someValuesFrom :PizzaBase
+                       ] ,
+                       [ rdf:type owl:Restriction ;
+                         owl:onProperty :hasCalorificContentValue ;
+                         owl:someValuesFrom xsd:integer
                        ] ;
        owl:disjointWith :PizzaTopping .
 
