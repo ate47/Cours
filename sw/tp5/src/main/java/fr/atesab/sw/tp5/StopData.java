@@ -1,7 +1,5 @@
 package fr.atesab.sw.tp5;
 
-import java.util.Arrays;
-
 public class StopData {
     public final String stopId;
     public final String stopName;

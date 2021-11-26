@@ -3,10 +3,8 @@ package fr.atesab.sw.tp5;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.nio.charset.Charset;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import org.apache.commons.codec.Charsets;
 
@@ -52,7 +50,7 @@ public class CSVReader<T> {
                 action.accept(t);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Can't read CSV", e);
         }
     }
 }

@@ -3,6 +3,10 @@
  */
 package fr.atesab.sw.tp5;
 
+import java.io.File;
+import java.io.FileWriter;
+
+import org.apache.commons.codec.Charsets;
 import org.apache.jena.datatypes.xsd.XSDDatatype.XSDGenericType;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdfconnection.RDFConnectionFactory;
@@ -19,6 +23,7 @@ public class Start {
     public static final String GEO_NAMESPACE = "http://www.w3.org/2003/01/geo/wgs84_pos#";
     public static final String EXT_NAMESPACE = "http://www.example.com/";
     public static final String DATASET_URL = "http://localhost:3030/dataset";
+    public static final boolean SEND_TO_SERVER = false;
 
     public static void main(String[] args) {
         // create an empty Model
@@ -36,30 +41,74 @@ public class Start {
         var latProperty = model.createProperty(GEO_NAMESPACE + "lat");
         var longProperty = model.createProperty(GEO_NAMESPACE + "long");
         var spatialThing = model.createResource(GEO_NAMESPACE + "SpatialThing");
+        var stopDescProperty = model.createProperty(EXT_NAMESPACE + "stopDesc");
+        var stopUrlProperty = model.createProperty(EXT_NAMESPACE + "stopUrl");
+        var locationTypeProperty = model.createProperty(EXT_NAMESPACE + "locationType");
+        var parentStationProperty = model.createProperty(EXT_NAMESPACE + "parentStation");
+        var locationTypeResources = LocationType.buildMap(EXT_NAMESPACE, model);
 
         // read the file
         var reader = new CSVReader<>(STOP_FILE, StopData::new);
         reader.readFile(sdata -> {
-            // create resource for the line
-            model.createResource(EXT_NAMESPACE + sdata.stopId)
+            // stopId
+            var r = model.createResource(EXT_NAMESPACE + sdata.stopId)
                     // set type
                     .addProperty(RDF.type, spatialThing) // a geo:SpacialThing
-                    // add label of the stop
+                    // stopName
                     .addProperty(RDFS.label, sdata.stopName)
-                    // longitude
+                    // stopLat
                     .addProperty(latProperty, sdata.stopLat, XSDGenericType.XSDdecimal)
-                    // latitude
+                    // stopLon
                     .addProperty(longProperty, sdata.stopLon, XSDGenericType.XSDdecimal);
 
+            // stopDesc
+            if (!sdata.stopDesc.isEmpty())
+                r.addProperty(stopDescProperty, sdata.stopDesc);
+
+            // stopUrl
+            if (!sdata.stopUrl.isEmpty())
+                r.addProperty(stopUrlProperty, model.createResource(sdata.stopUrl));
+            // locationType
+            var locationTypeId = Integer.parseInt(sdata.locationType);
+            var locationType = locationTypeResources[locationTypeId];
+            r.addProperty(locationTypeProperty, locationType);
+
+            // parentStation
+            switch (locationTypeId) {
+            case 0: // Stop/platform (location_type=0): the parent_station field contains the ID of
+                    // a station
+            case 2:
+            case 3: // Entrance/exit (location_type=2) or generic node (location_type=3): the
+                // parent_station field contains the ID of a station (location_type=1)
+                // a station
+            case 4: // Boarding Area (location_type=4): the parent_station field contains ID of a
+                // platform
+                if (!sdata.parentStation.isEmpty()) {
+                    r.addProperty(parentStationProperty, model.createResource(EXT_NAMESPACE + sdata.parentStation));
+                }
+                break;
+            case 1: // Station (location_type=1): this field must be empty
+            default:
+                break;
+            }
+
         });
-
-        // write it to standard out
-        // model.write(System.out, "TURTLE");
-
-        try (var conneg = RDFConnectionFactory.connect(DATASET_URL)) {
-            // conneg.update("INSERT DATA { <http://www.example.com/StopPoint:OCETrain> a
-            // <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> }"); // add
-            conneg.load(model); // add the content of model to the triplestore
+        if (SEND_TO_SERVER) {
+            try (var conneg = RDFConnectionFactory.connect(DATASET_URL)) {
+                conneg.load(model); // add the content of model to the triplestore
+            }
+        } else {
+            if (args.length > 0) {
+                // send to the file
+                try (var w = new FileWriter(new File(args[0]), Charsets.UTF_8)) {
+                    model.write(w, "TURTLE");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                // send to standard output
+                model.write(System.out, "TURTLE");
+            }
         }
 
     }
