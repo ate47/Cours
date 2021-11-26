@@ -3,9 +3,61 @@
  */
 package fr.atesab.sw.tp5;
 
+import org.apache.jena.datatypes.xsd.XSDDatatype.XSDGenericType;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdfconnection.RDFConnectionFactory;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.XSD;
+
 public class Start {
 
+    /**
+     * stop.txt file to read
+     */
+    public static final String STOP_FILE = "data/export-ter-gtfs-last/stops.txt";
+    public static final String GEO_NAMESPACE = "http://www.w3.org/2003/01/geo/wgs84_pos#";
+    public static final String EXT_NAMESPACE = "http://www.example.com/";
+    public static final String DATASET_URL = "http://localhost:3030/dataset";
+
     public static void main(String[] args) {
+        // create an empty Model
+
+        var model = ModelFactory.createDefaultModel()
+                // base ns
+                .setNsPrefix("ex", EXT_NAMESPACE)
+                // rdfs ns
+                .setNsPrefix("rdfs", RDFS.getURI())
+                // xsd ns
+                .setNsPrefix("xsd", XSD.getURI())
+                // geo ns
+                .setNsPrefix("geo", GEO_NAMESPACE);
+
+        // read the file
+        var reader = new CSVReader<>(STOP_FILE, StopData::new);
+        reader.readFile(sdata -> {
+            // create resource for the line
+            model.createResource(EXT_NAMESPACE + sdata.stopId)
+                    // set type
+                    .addProperty(RDF.type, model.createResource(GEO_NAMESPACE + "SpatialThing")) // a geo:SpacialThing
+                    // add label of the stop
+                    .addProperty(RDFS.label, sdata.stopName)
+                    // longitude
+                    .addProperty(model.createProperty(GEO_NAMESPACE + "lat"), sdata.stopLat, XSDGenericType.XSDdecimal)
+                    // latitude
+                    .addProperty(model.createProperty(GEO_NAMESPACE + "long"), sdata.stopLon,
+                            XSDGenericType.XSDdecimal);
+
+        });
+
+        // write it to standard out
+        // model.write(System.out, "TURTLE");
+
+        try (var conneg = RDFConnectionFactory.connect(DATASET_URL)) {
+            // conneg.update("INSERT DATA { <http://www.example.com/StopPoint:OCETrain> a
+            // <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> }"); // add
+            conneg.load(model); // add the content of model to the triplestore
+        }
 
     }
 }
