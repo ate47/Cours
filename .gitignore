@@ -202,3 +202,5 @@ logs
 *.docx
 *.gz
 
+# Graph file
+*.graph.txt
