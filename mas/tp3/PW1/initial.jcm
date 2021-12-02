@@ -1,24 +1,8 @@
-/*
-   JaCaMo Project for the house building scenario used
-   initially in the Multi-Agent Programming Tutorial @ EASSS 2010
-*/
-
 mas house_building {
-
-   // the agent that wants to build a house
    agent giacomo : clientQ1a.asl {
-      focus: site.housegui
    }
    agent andrei  : clientQ1b.asl {
-      focus: site.housegui
    }
-
-   // builder agents (see their code for details)
    agent companyA : companyQ1.asl {  
-      focus: site.housegui
    }
-
-   // workspace site {   // workspace site shared between the agents
-   // 	artifact housegui : simulator.House  // shared artifact for the house
-   // }
 }
