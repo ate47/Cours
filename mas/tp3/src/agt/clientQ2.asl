@@ -8,7 +8,9 @@ action(update).
 
 
 /* Plans */
-
++requestManagement(Action, Knowledge, Skill, Value)
+    <-
+      .
 
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }
