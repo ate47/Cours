@@ -13,7 +13,9 @@ apply plugin: 'eclipse'
 version '1.0'
 group   'org.jacamo'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     maven { url "https://raw.github.com/jacamo-lang/mvn-repo/master" }
