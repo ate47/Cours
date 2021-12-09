@@ -10,7 +10,7 @@
       "request": "launch",
       "mode": "auto",
       "program": "${fileDirname}",
-      "args": ["F", "test_file.txt", "crevette"]
+      "args": ["S", "crevette", "crevette"]
     }
   ]
 }
