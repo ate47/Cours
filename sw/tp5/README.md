@@ -6,9 +6,11 @@
 
 - [Semantic web practical 5](#semantic-web-practical-5)
 - [Table of contents](#table-of-contents)
-- [Started](#started)
+- [Getting Started](#getting-started)
 
-# Started
+# Getting Started
+
+**Java 16** is required to run this project
 
 **Create project**
 
