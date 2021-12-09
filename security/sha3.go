@@ -1,5 +1,11 @@
 package main
 
+/*
+	sources:
+	https://en.wikipedia.org/wiki/SHA-3
+	https://www.youtube.com/watch?v=JWskjzgiIa4&t=5065s
+*/
+
 import (
 	"encoding/hex"
 	"fmt"
@@ -177,6 +183,7 @@ func keccakF5Iota(buffer []byte, round int) {
 	bitsBufferSetLine(buffer, 0, 0, bitsBufferGetLine(buffer, 0, 0)^IOTA_CONSTS[round])
 }
 
+// set a buffer to 0s (debug)
 func zeros(buffer []byte) {
 	for i := 0; i < len(buffer); i++ {
 		buffer[i] = 0
@@ -187,7 +194,7 @@ func keccakF(buffer []byte, buffer2 []byte) {
 	// 12 + 2*l
 	rounds := 24
 	for i := 0; i < rounds; i++ {
-		// notice the swap the buffer in the process calls, it's intentional
+		// notice the swap of the buffers in the function calls, it's intentional
 
 		// 1 - theta
 		keccakF1Theta(buffer, buffer2)
