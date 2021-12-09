@@ -6,12 +6,31 @@ import (
 	"os"
 )
 
-var ROTATION_CONSTS = [][]int{
-	{0, 1, 62, 28, 27},
-	{36, 44, 6, 55, 20},
-	{3, 10, 43, 25, 39},
-	{41, 45, 15, 21, 8},
-	{18, 2, 61, 56, 14},
+var RHO_CONSTS = [][]int{
+	{0, 1},
+	{2, 0},
+	{1, 2},
+	{2, 1},
+	{3, 2},
+	{3, 3},
+	{0, 3},
+	{1, 0},
+	{3, 1},
+	{1, 3},
+	{4, 1},
+	{4, 4},
+	{0, 4},
+	{3, 0},
+	{4, 3},
+	{3, 4},
+	{2, 3},
+	{2, 2},
+	{0, 2},
+	{4, 0},
+	{2, 4},
+	{4, 2},
+	{1, 4},
+	{1, 1},
 }
 
 var IOTA_CONSTS = []uint64{
@@ -45,6 +64,10 @@ func printHex(buffer []byte) {
 	fmt.Println(hex.EncodeToString(buffer))
 }
 
+func mod(a int, b int) int {
+	return ((a % b) + b) % b
+}
+
 func neg(v uint64) uint64 {
 	return v ^ uint64(0xFFFF_FFFF_FFFF_FFFF)
 }
@@ -58,15 +81,15 @@ func xor(a []byte, b []byte) {
 
 // get the **bit** at location x, y, z
 func bitsBufferGet(buffer []byte, x int, y int, z int) byte {
-	bit := (z*5+x)*64 + y
+	bit := (x*5+z)*64 + y
 	return (buffer[bit>>3] >> (bit & 7)) & 1
 }
 
 // set the **bit** at location x, y, z
 func bitsBufferSet(buffer []byte, x int, y int, z int, value byte) {
-	bit := (z*5+x)*64 + y
+	bit := (x*5+z)*64 + y
 	if value == 0 {
-		buffer[bit>>3] ^= (buffer[bit>>3] << (bit & 7))
+		buffer[bit>>3] ^= (buffer[bit>>3] & (1 << (bit & 7)))
 	} else {
 		buffer[bit>>3] |= (1 << (bit & 7))
 	}
@@ -90,40 +113,48 @@ func bitsBufferGetLine(buffer []byte, x int, z int) uint64 {
 
 // compute the keccak step 1
 func keccakF1Theta(buffer []byte, buffer2 []byte) {
-	for x := 0; x < 5; x++ {
-		for y := 0; y < 64; y++ {
-			leftX := (x - 1 + 5) % 5
-			rightX := (x + 1) % 5
+	for y := 0; y < 64; y++ {
+		for z := 0; z < 5; z++ {
+			leftZ := (z - 1 + 5) % 5
+			rightZ := (z + 1) % 5
 			frontY := (y - 1 + 64) % 64
 			parityLeft := byte(0)
 			parityRight := byte(0)
 
-			for z := 0; z < 5; z++ {
-				parityLeft ^= bitsBufferGet(buffer, leftX, y, z)
-				parityRight ^= bitsBufferGet(buffer, rightX, frontY, z)
+			for x := 0; x < 5; x++ {
+				parityLeft ^= bitsBufferGet(buffer, x, y, leftZ)
+				parityRight ^= bitsBufferGet(buffer, x, frontY, rightZ)
 			}
 
-			for z := 0; z < 5; z++ {
+			for x := 0; x < 5; x++ {
 				bitsBufferSet(buffer2, x, y, z, bitsBufferGet(buffer, x, y, z)^parityLeft^parityRight)
 			}
 		}
 	}
 }
 
-// compute the keccak step 2 and 3
-func keccakF23RhoPi(buffer []byte, buffer2 []byte) {
+// compute the keccak step 2
+func keccakF2Rho(buffer []byte, buffer2 []byte) {
+	// the line (0,0) is not rotated
+	bitsBufferSetLine(buffer2, 0, 0, bitsBufferGetLine(buffer, 0, 0))
+
+	// rotate the other lines
+	for t := 0; t < 24; t++ {
+		x := RHO_CONSTS[t][0]
+		z := RHO_CONSTS[t][1]
+
+		for y := 0; y < 64; y++ {
+			bitsBufferSet(buffer2, x, y, z, bitsBufferGet(buffer, x, mod(y-(t+1)*(t+2)/2, 64), z))
+		}
+	}
+
+}
+
+// compute the keccak step 3
+func keccakF3Pi(buffer []byte, buffer2 []byte) {
 	for x := 0; x < 5; x++ {
 		for z := 0; z < 5; z++ {
-			rotation := ROTATION_CONSTS[z][x]
-
-			// step 2 rho - rotate the (x,z) into line
-			line := uint64(0)
-			for y := 0; y < 64; y++ {
-				line |= uint64(bitsBufferGet(buffer, x, (y+rotation)%64, z)) << y
-			}
-
-			// step 3 pi - set the line on another location
-			bitsBufferSetLine(buffer2, z, (3*x+2*z)%5, line)
+			bitsBufferSetLine(buffer2, (3*x+2*z)%5, z, bitsBufferGetLine(buffer, x, z))
 		}
 	}
 }
@@ -142,44 +173,39 @@ func keccakF4Chi(buffer []byte, buffer2 []byte) {
 }
 
 // compute the keccak step 5
-func keccakF5Iota(buffer []byte, buffer2 []byte, round int) {
-	copy(buffer2, buffer)
-	line := bitsBufferGetLine(buffer, 0, 0)
-	bitsBufferSetLine(buffer2, 0, 0, line^IOTA_CONSTS[round])
+func keccakF5Iota(buffer []byte, round int) {
+	bitsBufferSetLine(buffer, 0, 0, bitsBufferGetLine(buffer, 0, 0)^IOTA_CONSTS[round])
+}
+
+func zeros(buffer []byte) {
+	for i := 0; i < len(buffer); i++ {
+		buffer[i] = 0
+	}
 }
 
 func keccakF(buffer []byte, buffer2 []byte) {
 	// 12 + 2*l
 	rounds := 24
 	for i := 0; i < rounds; i++ {
-		fmt.Printf("round %d\n", i)
-		printHex(buffer)
 		// notice the swap the buffer in the process calls, it's intentional
 
 		// 1 - theta
 		keccakF1Theta(buffer, buffer2)
-		fmt.Println("end theta:")
-		printHex(buffer2)
-		// 2 - rho and 3 - pi
-		keccakF23RhoPi(buffer2, buffer)
-		fmt.Println("end rhopi:")
-		printHex(buffer)
+		// 2 - rho
+		keccakF2Rho(buffer2, buffer)
+		// 3 - pi
+		keccakF3Pi(buffer, buffer2)
 		// 4 - chi
-		keccakF4Chi(buffer, buffer2)
-		fmt.Println("end chi:")
-		printHex(buffer2)
+		keccakF4Chi(buffer2, buffer)
 		// 5 - iota
-		keccakF5Iota(buffer2, buffer, i)
-		fmt.Println("end iota:")
-		printHex(buffer)
-
-		return
+		keccakF5Iota(buffer, i)
 	}
 }
 
 // sha3 of a byte array for 256 output size
 // (here is where the fun begins)
 func sha3(text []byte, salt []byte) []byte {
+	toHash := append(salt, text...)
 	// Keccak sha3
 	// l := 6
 	// 25*2**l
@@ -191,21 +217,19 @@ func sha3(text []byte, salt []byte) []byte {
 
 	var blocks int
 
-	if len(text)%blockSize == 0 {
-		blocks = len(text) / blockSize
+	if len(toHash)%blockSize == 0 {
+		blocks = len(toHash) / blockSize
 	} else {
-		blocks = len(text)/blockSize + 1
+		blocks = len(toHash)/blockSize + 1
 	}
 
 	buffer := make([]byte, b)
 	buffer2 := make([]byte, b)
 
-	// TODO: fill initial buffer
-
 	// absorbing phase
 
 	for i := 0; i < blocks; i++ {
-		xor(buffer[:blockSize], text[i*blockSize:])
+		xor(buffer[:blockSize], toHash[i*blockSize:])
 		keccakF(buffer, buffer2)
 	}
 
