@@ -14,6 +14,37 @@ var ROTATION_CONSTS = [][]int{
 	{18, 2, 61, 56, 14},
 }
 
+var IOTA_CONSTS = []uint64{
+	0x0000_0000_0000_0001,
+	0x0000_0000_0000_8082,
+	0x8000_0000_0000_808a,
+	0x8000_0000_8000_8000,
+	0x0000_0000_0000_808b,
+	0x0000_0000_8000_0001,
+	0x8000_0000_8000_8081,
+	0x8000_0000_0000_8009,
+	0x0000_0000_0000_008a,
+	0x0000_0000_0000_0088,
+	0x0000_0000_8000_8009,
+	0x0000_0000_8000_000a,
+	0x0000_0000_8000_808b,
+	0x8000_0000_0000_008b,
+	0x8000_0000_0000_8089,
+	0x8000_0000_0000_8003,
+	0x8000_0000_0000_8002,
+	0x8000_0000_0000_0080,
+	0x0000_0000_0000_800a,
+	0x8000_0000_8000_000a,
+	0x8000_0000_8000_8081,
+	0x8000_0000_0000_8080,
+	0x0000_0000_8000_0001,
+	0x8000_0000_8000_8008,
+}
+
+func neg(v uint64) uint64 {
+	return v ^ uint64(0xFFFF_FFFF_FFFF_FFFF)
+}
+
 // xor two byte arrays, if len(a) != len(b), only the first min(len(a), len(b)) are affected
 func xor(a []byte, b []byte) {
 	for i := 0; i < len(a) && i < len(b); i++ {
@@ -29,16 +60,25 @@ func bitsBufferGet(buffer []byte, x int, y int, z int) byte {
 
 // set the **bit** at location x, y, z
 func bitsBufferSet(buffer []byte, x int, y int, z int, value byte) {
-	bit := (x*5+y)*64 + z
+	bit := (z*5+x)*64 + y
 	valueShifted := (value & 1) << (bit & 7)
 	buffer[bit>>3] = (buffer[bit>>3] | valueShifted) & valueShifted
 }
 
 // set the 64 bits line at location x, z
-func bitsBufferSetLine(buffer []byte, x int, z int, value int64) {
+func bitsBufferSetLine(buffer []byte, x int, z int, value uint64) {
 	for y := 0; y < 64; y++ {
 		bitsBufferSet(buffer, x, y, z, byte((value>>y)&1))
 	}
+}
+
+// get the 64 bits line at location x, z
+func bitsBufferGetLine(buffer []byte, x int, z int) uint64 {
+	line := uint64(0)
+	for y := 0; y < 64; y++ {
+		line |= uint64(bitsBufferGet(buffer, x, y, z)) << y
+	}
+	return line
 }
 
 // compute the keccak step 1
@@ -70,9 +110,9 @@ func keccakF23RhoPi(buffer []byte, buffer2 []byte) {
 			rotation := ROTATION_CONSTS[x][z]
 
 			// step 2 rho - rotate the (x,z) into line
-			line := int64(0)
+			line := uint64(0)
 			for y := 0; y < 64; y++ {
-				line |= int64(bitsBufferGet(buffer, x, (y+rotation)%64, z)) << y
+				line |= uint64(bitsBufferGet(buffer, x, (y+rotation)%64, z)) << y
 			}
 
 			// step 3 pi - set the line on another location
@@ -83,12 +123,22 @@ func keccakF23RhoPi(buffer []byte, buffer2 []byte) {
 
 // compute the keccak step 4
 func keccakF4Chi(buffer []byte, buffer2 []byte) {
+	for x := 0; x < 5; x++ {
+		for z := 0; z < 5; z++ {
+			line := bitsBufferGetLine(buffer, x, z)
+			line2 := bitsBufferGetLine(buffer, (x+1)%5, z)
+			line3 := bitsBufferGetLine(buffer, (x+2)%5, z)
+			bitsBufferSetLine(buffer2, x, z, line^(neg(line2)&line3))
+		}
+	}
 
 }
 
 // compute the keccak step 5
-func keccakF5Iota(buffer []byte, buffer2 []byte) {
-
+func keccakF5Iota(buffer []byte, buffer2 []byte, round int) {
+	copy(buffer2, buffer)
+	line := bitsBufferGetLine(buffer, 0, 0)
+	bitsBufferSetLine(buffer2, 0, 0, line^IOTA_CONSTS[round])
 }
 
 func keccakF(buffer []byte, buffer2 []byte) {
@@ -104,7 +154,7 @@ func keccakF(buffer []byte, buffer2 []byte) {
 		// 4 - chi
 		keccakF4Chi(buffer, buffer2)
 		// 5 - iota
-		keccakF5Iota(buffer2, buffer)
+		keccakF5Iota(buffer2, buffer, i)
 	}
 }
 
