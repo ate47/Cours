@@ -14,11 +14,17 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
 
+import fr.atesab.sw.tp5.model.AgencyData;
+import fr.atesab.sw.tp5.model.RouteData;
+import fr.atesab.sw.tp5.model.StopData;
+
 public class Start {
 
     /**
      * stop.txt file to read
      */
+    public static final String AGENCY_FILE = "data/export-ter-gtfs-last/agency.txt";
+    public static final String ROUTES_FILE = "data/export-ter-gtfs-last/routes.txt";
     public static final String STOP_FILE = "data/export-ter-gtfs-last/stops.txt";
     public static final String GEO_NAMESPACE = "http://www.w3.org/2003/01/geo/wgs84_pos#";
     public static final String EXT_NAMESPACE = "http://www.example.com/";
@@ -47,9 +53,11 @@ public class Start {
         var parentStationProperty = model.createProperty(EXT_NAMESPACE + "parentStation");
         var locationTypeResources = LocationType.buildMap(EXT_NAMESPACE, model);
 
-        // read the file
-        var reader = new CSVReader<>(STOP_FILE, StopData::new);
-        reader.readFile(sdata -> {
+        /*
+         * Read the stops.txt file
+         */
+
+        new CSVReader<>(STOP_FILE, StopData::new).readFile(sdata -> {
             // stopId
             var r = model.createResource(EXT_NAMESPACE + sdata.stopId)
                     // set type
@@ -69,12 +77,11 @@ public class Start {
             if (!sdata.stopUrl.isEmpty())
                 r.addProperty(stopUrlProperty, model.createResource(sdata.stopUrl));
             // locationType
-            var locationTypeId = Integer.parseInt(sdata.locationType);
-            var locationType = locationTypeResources[locationTypeId];
-            r.addProperty(locationTypeProperty, locationType);
+            var locationType = locationTypeResources[Integer.parseInt(sdata.locationType)];
+            r.addProperty(locationTypeProperty, locationType.resource());
 
             // parentStation
-            switch (locationTypeId) {
+            switch (locationType.id()) {
             case 0: // Stop/platform (location_type=0): the parent_station field contains the ID of
                     // a station
             case 2:
@@ -93,6 +100,37 @@ public class Start {
             }
 
         });
+
+        /*
+         * Read the routes.txt file
+         */
+
+        new CSVReader<>(ROUTES_FILE, RouteData::new).readFile(rdata -> {
+            // routeId
+            // agencyId
+            // routeShortName
+            // routeLongName
+            // routeDesc
+            // routeType
+            // routeUrl
+            // routeColor
+            // routeTextColor
+            // TODO: add triples
+
+        });
+        /*
+         * Read the agency.txt file
+         */
+
+        new CSVReader<>(AGENCY_FILE, AgencyData::new).readFile(adata -> {
+            // agencyId
+            // agencyName
+            // agencyUrl
+            // agencyTimezone
+            // agencyLang
+            // TODO: add triples
+        });
+        // TODO: continue for each files
         if (SEND_TO_SERVER) {
             try (var conneg = RDFConnectionFactory.connect(DATASET_URL)) {
                 conneg.load(model); // add the content of model to the triplestore

@@ -1,4 +1,4 @@
-package fr.atesab.sw.tp5;
+package fr.atesab.sw.tp5.model;
 
 public class StopData {
     public final String stopId;
