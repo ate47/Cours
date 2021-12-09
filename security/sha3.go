@@ -41,6 +41,10 @@ var IOTA_CONSTS = []uint64{
 	0x8000_0000_8000_8008,
 }
 
+func printHex(buffer []byte) {
+	fmt.Println(hex.EncodeToString(buffer))
+}
+
 func neg(v uint64) uint64 {
 	return v ^ uint64(0xFFFF_FFFF_FFFF_FFFF)
 }
@@ -61,8 +65,11 @@ func bitsBufferGet(buffer []byte, x int, y int, z int) byte {
 // set the **bit** at location x, y, z
 func bitsBufferSet(buffer []byte, x int, y int, z int, value byte) {
 	bit := (z*5+x)*64 + y
-	valueShifted := (value & 1) << (bit & 7)
-	buffer[bit>>3] = (buffer[bit>>3] | valueShifted) & valueShifted
+	if value == 0 {
+		buffer[bit>>3] ^= (buffer[bit>>3] << (bit & 7))
+	} else {
+		buffer[bit>>3] |= (1 << (bit & 7))
+	}
 }
 
 // set the 64 bits line at location x, z
@@ -107,7 +114,7 @@ func keccakF1Theta(buffer []byte, buffer2 []byte) {
 func keccakF23RhoPi(buffer []byte, buffer2 []byte) {
 	for x := 0; x < 5; x++ {
 		for z := 0; z < 5; z++ {
-			rotation := ROTATION_CONSTS[x][z]
+			rotation := ROTATION_CONSTS[z][x]
 
 			// step 2 rho - rotate the (x,z) into line
 			line := uint64(0)
@@ -116,7 +123,7 @@ func keccakF23RhoPi(buffer []byte, buffer2 []byte) {
 			}
 
 			// step 3 pi - set the line on another location
-			bitsBufferSetLine(buffer2, z, (2*x+3*z)%5, line)
+			bitsBufferSetLine(buffer2, z, (3*x+2*z)%5, line)
 		}
 	}
 }
@@ -125,10 +132,10 @@ func keccakF23RhoPi(buffer []byte, buffer2 []byte) {
 func keccakF4Chi(buffer []byte, buffer2 []byte) {
 	for x := 0; x < 5; x++ {
 		for z := 0; z < 5; z++ {
-			line := bitsBufferGetLine(buffer, x, z)
-			line2 := bitsBufferGetLine(buffer, (x+1)%5, z)
-			line3 := bitsBufferGetLine(buffer, (x+2)%5, z)
-			bitsBufferSetLine(buffer2, x, z, line^(neg(line2)&line3))
+			a := bitsBufferGetLine(buffer, x, z)
+			b := bitsBufferGetLine(buffer, x, (z+1)%5)
+			c := bitsBufferGetLine(buffer, x, (z+2)%5)
+			bitsBufferSetLine(buffer2, x, z, a^(neg(b)&c))
 		}
 	}
 
@@ -145,16 +152,28 @@ func keccakF(buffer []byte, buffer2 []byte) {
 	// 12 + 2*l
 	rounds := 24
 	for i := 0; i < rounds; i++ {
+		fmt.Printf("round %d\n", i)
+		printHex(buffer)
 		// notice the swap the buffer in the process calls, it's intentional
 
 		// 1 - theta
 		keccakF1Theta(buffer, buffer2)
+		fmt.Println("end theta:")
+		printHex(buffer2)
 		// 2 - rho and 3 - pi
 		keccakF23RhoPi(buffer2, buffer)
+		fmt.Println("end rhopi:")
+		printHex(buffer)
 		// 4 - chi
 		keccakF4Chi(buffer, buffer2)
+		fmt.Println("end chi:")
+		printHex(buffer2)
 		// 5 - iota
 		keccakF5Iota(buffer2, buffer, i)
+		fmt.Println("end iota:")
+		printHex(buffer)
+
+		return
 	}
 }
 
@@ -223,15 +242,19 @@ func main() {
 
 	function := os.Args[1]
 
+	var buffer []byte
+
 	switch function {
 	case "f", "F":
-		fmt.Println(hex.EncodeToString(sha3f(os.Args[2], []byte(os.Args[3]))))
+		buffer = sha3f(os.Args[2], []byte(os.Args[3]))
 		break
 	case "s", "S":
-		fmt.Println(hex.EncodeToString(sha3s(os.Args[2], []byte(os.Args[3]))))
+		buffer = sha3s(os.Args[2], []byte(os.Args[3]))
 		break
 	default:
 		usage()
-		break
+		return
 	}
+
+	printHex(buffer)
 }
