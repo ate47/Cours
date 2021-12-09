@@ -67,6 +67,10 @@ var IOTA_CONSTS = []uint64{
 }
 
 func printHex(buffer []byte) {
+	for i := 0; i < len(buffer); i++ {
+		fmt.Printf("%08b", buffer[i])
+	}
+	fmt.Printf("\n")
 	fmt.Println(hex.EncodeToString(buffer))
 }
 
@@ -181,13 +185,7 @@ func keccakF5Iota(buffer []byte, round int) {
 	bitsBufferSetLine(buffer, 0, 0, bitsBufferGetLine(buffer, 0, 0)^IOTA_CONSTS[round])
 }
 
-// set a buffer to 0s (debug)
-func zeros(buffer []byte) {
-	for i := 0; i < len(buffer); i++ {
-		buffer[i] = 0
-	}
-}
-
+// compute the keccak f into buffer from buffer, len(buffer2) should be the same as len(buffer)
 func keccakF(buffer []byte, buffer2 []byte) {
 	// 12 + 2*l
 	rounds := 24
@@ -276,10 +274,8 @@ func main() {
 	switch function {
 	case "f", "F":
 		buffer = sha3f(os.Args[2], []byte(os.Args[3]))
-		break
 	case "s", "S":
 		buffer = sha3s(os.Args[2], []byte(os.Args[3]))
-		break
 	default:
 		usage()
 		return
