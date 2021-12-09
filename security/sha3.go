@@ -124,16 +124,14 @@ func keccakF1Theta(buffer []byte, buffer2 []byte) {
 			leftZ := (z - 1 + 5) % 5
 			rightZ := (z + 1) % 5
 			frontY := (y - 1 + 64) % 64
-			parityLeft := byte(0)
-			parityRight := byte(0)
+			parity := byte(0)
 
 			for x := 0; x < 5; x++ {
-				parityLeft ^= bitsBufferGet(buffer, x, y, leftZ)
-				parityRight ^= bitsBufferGet(buffer, x, frontY, rightZ)
+				parity ^= bitsBufferGet(buffer, x, y, leftZ) ^ bitsBufferGet(buffer, x, frontY, rightZ)
 			}
 
 			for x := 0; x < 5; x++ {
-				bitsBufferSet(buffer2, x, y, z, bitsBufferGet(buffer, x, y, z)^parityLeft^parityRight)
+				bitsBufferSet(buffer2, x, y, z, bitsBufferGet(buffer, x, y, z)^parity)
 			}
 		}
 	}
