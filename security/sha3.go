@@ -158,7 +158,7 @@ func keccakF2Rho(buffer []byte, buffer2 []byte) {
 func keccakF3Pi(buffer []byte, buffer2 []byte) {
 	for x := 0; x < 5; x++ {
 		for z := 0; z < 5; z++ {
-			bitsBufferSetLine(buffer2, (3*x+2*z)%5, z, bitsBufferGetLine(buffer, x, z))
+			bitsBufferSetLine(buffer2, (3*x+2*z)%5, x, bitsBufferGetLine(buffer, x, z))
 		}
 	}
 }
