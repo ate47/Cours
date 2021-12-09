@@ -2,6 +2,8 @@
 
 # Security
 
+**Disclaimer**: The sha3 implementation isn't working yet!!!
+
 <!-- https://www.browserling.com/tools/sha3-hash -->
 
 ```python
