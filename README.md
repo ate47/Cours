@@ -8,3 +8,4 @@ This repo contains notes or practicals to some courses.
 - [Recherche info](ri/README.md)
 - [Security](security/README.md)
 - [Semantic web](sw/README.md)
+- [Deadlines](deadlines.md)
