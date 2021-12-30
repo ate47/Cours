@@ -25,7 +25,7 @@ Create things
 
 ?
 
-## Deep Learning - ??/01
+## Deep Learning - 12/01
 
 [Github](https://github.com/ate47/S9DeepLearning), branch `dev`.
 
