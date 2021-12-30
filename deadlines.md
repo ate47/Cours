@@ -5,7 +5,7 @@
   - [Recherche informations - 03/01](#recherche-informations---0301)
   - [Semantic web - 07/01](#semantic-web---0701)
   - [Data Mining - 28/01](#data-mining---2801)
-  - [Deep Learning - ??/01](#deep-learning---01)
+  - [Deep Learning - 12/01](#deep-learning---01)
 
 # Master 2
 
