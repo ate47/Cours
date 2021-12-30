@@ -13,7 +13,7 @@
 
 [Github](https://github.com/ThomasGUICHARD/RechercheInformation), branch `atian`.
 
-Compute the runs results, optimize values, add parsing with elements, no overlapping.
+Compute the runs results, optimize values/code.
 
 ## Semantic web - 07/01
 
